@@ -1,14 +1,20 @@
-﻿<?xml version = "1.0" encoding = "UTF-8" ?>
-<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:MusicPlayer"
-             x:Class="MusicPlayer.App">
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
-                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Application.Resources>
-</Application>
+﻿<Application.Resources>
+    <ResourceDictionary>
+        <Color x:Key="Primary">#6750A4</Color>
+        <Color x:Key="PrimaryDark">#4F378B</Color>
+        <Color x:Key="Secondary">#958DA5</Color>
+        <Color x:Key="SecondaryDark">#7A7289</Color>
+        <Color x:Key="Background">#FFFBFE</Color>
+        <Color x:Key="BackgroundDark">#1C1B1F</Color>
+
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Secondary}, 
+                                                               Dark={StaticResource SecondaryDark}}"/>
+        </Style>
+
+        <Style TargetType="ContentPage">
+            <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Background}, 
+                                                                     Dark={StaticResource BackgroundDark}}"/>
+        </Style>
+    </ResourceDictionary>
+</Application.Resources>

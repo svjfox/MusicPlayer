@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MusicPlayer.Views.PlaylistDetailPage"
+             Title="Playlist"
+             xmlns:vm="clr-namespace:MusicPlayer.ViewModels"
+             x:DataType="vm:PlaylistDetailViewModel">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Playlist Info -->
+        <Grid Grid.Row="0" Padding="20" ColumnDefinitions="Auto,*">
+            <Image Source="{Binding Playlist.CoverImage}"
+                   WidthRequest="100"
+                   HeightRequest="100"
+                   Aspect="AspectFill"/>
+
+            <StackLayout Grid.Column="1" Padding="10">
+                <Label Text="{Binding Playlist.Name}"
+                       FontSize="20"
+                       FontAttributes="Bold"/>
+                <Label Text="{Binding Playlist.Description}"
+                       FontSize="14"/>
+                <Label Text="{Binding Tracks.Count, StringFormat='{0} tracks'}"
+                       FontSize="14"/>
+            </StackLayout>
+        </Grid>
+
+        <!-- Tracks List -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Tracks}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="10" ColumnDefinitions="Auto,*,Auto">
+                        <Image Source="{Binding Artwork}"
+                               WidthRequest="50"
+                               HeightRequest="50"
+                               Aspect="AspectFill"/>
+                        <StackLayout Grid.Column="1" Padding="10,0">
+                            <Label Text="{Binding Title}"
+                                   FontSize="16"/>
+                            <Label Text="{Binding Artist}"
+                                   FontSize="14"/>
+                        </StackLayout>
+                        <Button Grid.Column="2"
+                                Text="▶"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistDetailViewModel}},
+                                                Path=PlayTrackCommand}"
+                                CommandParameter="{Binding .}"
+                                BackgroundColor="Transparent"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MusicPlayer.Views.PlayerPage"
+             Title="Now Playing"
+             xmlns:vm="clr-namespace:MusicPlayer.ViewModels"
+             x:DataType="vm:PlayerViewModel">
+
+    <Grid RowDefinitions="*,Auto,Auto,Auto,Auto,Auto" Padding="20">
+        <!-- Album Art with Rotation Animation -->
+        <Image Source="{Binding CurrentTrack.Artwork}"
+               Grid.Row="0"
+               Aspect="AspectFill"
+               MaximumHeightRequest="400"
+               Margin="0,0,0,20">
+            <Image.Clip>
+                <RoundRectangleGeometry CornerRadius="20"
+                                       Rect="0,0,400,400"/>
+            </Image.Clip>
+            <Image.Behaviors>
+                <toolkit:AnimationBehavior>
+                    <toolkit:AnimationBehavior.AnimationType>
+                        <toolkit:RotateAnimation Rotation="360"
+                                                Duration="20000"
+                                                Easing="{x:Static Easing.Linear}"
+                                                RepeatCount="-1"/>
+                    </toolkit:AnimationBehavior.AnimationType>
+                    <toolkit:AnimationBehavior.Triggers>
+                        <toolkit:EventTrigger EventName="Appearing">
+                            <toolkit:BeginAnimation/>
+                        </toolkit:EventTrigger>
+                        <toolkit:DataTrigger Binding="{Binding IsPlaying}"
+                                            Value="False"
+                                            TargetType="toolkit:AnimationBehavior">
+                            <toolkit:PauseAnimation/>
+                        </toolkit:DataTrigger>
+                        <toolkit:DataTrigger Binding="{Binding IsPlaying}"
+                                            Value="True"
+                                            TargetType="toolkit:AnimationBehavior">
+                            <toolkit:ResumeAnimation/>
+                        </toolkit:DataTrigger>
+                    </toolkit:AnimationBehavior.Triggers>
+                </toolkit:AnimationBehavior>
+            </Image.Behaviors>
+        </Image>
+
+        <!-- Track Info -->
+        <StackLayout Grid.Row="1" Spacing="5">
+            <Label Text="{Binding CurrentTrack.Title}"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   MaxLines="1"
+                   LineBreakMode="TailTruncation"/>
+            <Label Text="{Binding CurrentTrack.Album} • {Binding CurrentTrack.Artist}"
+                   FontSize="16"
+                   HorizontalTextAlignment="Center"
+                   MaxLines="1"
+                   LineBreakMode="TailTruncation"/>
+        </StackLayout>
+
+        <!-- Progress Bar -->
+        <Slider Grid.Row="2" 
+                Minimum="0"
+                Maximum="{Binding Duration}"
+                Value="{Binding Position}"
+                ThumbColor="{StaticResource Primary}"
+                MinimumTrackColor="{StaticResource Primary}"
+                MaximumTrackColor="{StaticResource Secondary}"
+                DragStartedCommand="{Binding PauseCommand}"
+                DragCompletedCommand="{Binding PlayCommand}"
+                ValueChangedCommand="{Binding SeekToCommand}"
+                Margin="0,10"/>
+
+        <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto" Padding="0,5">
+            <Label Text="{Binding Position, StringFormat='{0:mm\\:ss}'}"
+                   Grid.Column="0"/>
+            <Label Text="{Binding TimeLeft, StringFormat='-{0:mm\\:ss}'}"
+                   Grid.Column="2"
+                   HorizontalTextAlignment="End"/>
+        </Grid>
+
+        <!-- Main Controls -->
+        <Grid Grid.Row="4" ColumnDefinitions="*,*,*,*,*" Padding="0,20">
+            <Button Grid.Column="0" 
+                    Text="⏮"
+                    FontSize="24"
+                    Command="{Binding PreviousCommand}"
+                    BackgroundColor="Transparent"/>
+
+            <Button Grid.Column="2" 
+                    Text="{Binding PlayPauseIcon}"
+                    FontSize="32"
+                    Command="{Binding TogglePlayCommand}"
+                    BackgroundColor="Transparent"/>
+
+            <Button Grid.Column="4" 
+                    Text="⏭"
+                    FontSize="24"
+                    Command="{Binding NextCommand}"
+                    BackgroundColor="Transparent"/>
+
+            <Button Grid.Column="1" 
+                    Text="🔀"
+                    FontSize="24"
+                    TextColor="{Binding IsShuffleEnabled, 
+                                      Converter={StaticResource BoolToColorConverter},
+                                      ConverterParameter={StaticResource Primary}}"
+                    Command="{Binding ToggleShuffleCommand}"
+                    BackgroundColor="Transparent"/>
+
+            <Button Grid.Column="3" 
+                    Text="🔁"
+                    FontSize="24"
+                    TextColor="{Binding IsRepeatEnabled, 
+                                      Converter={StaticResource BoolToColorConverter},
+                                      ConverterParameter={StaticResource Primary}}"
+                    Command="{Binding ToggleRepeatCommand}"
+                    BackgroundColor="Transparent"/>
+        </Grid>
+
+        <!-- Additional Controls -->
+        <Grid Grid.Row="5" ColumnDefinitions="*,*,*,*" Padding="0,10">
+            <Button Grid.Column="0"
+                    Text="EQ"
+                    Command="{Binding OpenEqualizerCommand}"
+                    BackgroundColor="Transparent"/>
+
+            <Button Grid.Column="1"
+                    Text="⏱"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, 
+                                    Path=ShowSleepTimerOptions}"
+                    BackgroundColor="Transparent"/>
+
+            <Slider Grid.Column="2"
+                    Minimum="0.5"
+                    Maximum="2.0"
+                    Value="{Binding PlaybackSpeed}"
+                    ThumbColor="{StaticResource Primary}"
+                    MinimumTrackColor="{StaticResource Primary}"
+                    MaximumTrackColor="{StaticResource Secondary}"
+                    WidthRequest="100"
+                    HorizontalOptions="Center"
+                    ValueChangedCommand="{Binding SpeedChangedCommand}"/>
+
+            <Slider Grid.Column="3"
+                    Minimum="0"
+                    Maximum="1"
+                    Value="{Binding Volume}"
+                    ThumbColor="{StaticResource Primary}"
+                    MinimumTrackColor="{StaticResource Primary}"
+                    MaximumTrackColor="{StaticResource Secondary}"
+                    WidthRequest="100"
+                    HorizontalOptions="Center"
+                    ValueChangedCommand="{Binding VolumeChangedCommand}"/>
+        </Grid>
+
+        <!-- Equalizer Popup -->
+        <Border IsVisible="{Binding IsEqualizerOpen}"
+                Grid.RowSpan="6"
+                BackgroundColor="{AppThemeBinding Light=White, Dark=#2D2D2D}"
+                Padding="20"
+                Stroke="Transparent"
+                StrokeShape="RoundRectangle 20"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                WidthRequest="300"
+                HeightRequest="300">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <Label Text="Equalizer"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"/>
+
+                <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*" 
+                      HorizontalOptions="Center"
+                      VerticalOptions="Center">
+                    <!-- 5-band equalizer sliders -->
+                    <Slider Grid.Column="0" Minimum="-12" Maximum="12" Value="0"
+                             Orientation="Vertical"
+                             HeightRequest="150"
+                             ValueChangedCommand="{Binding SetEqualizerBandCommand}"
+                             ValueChangedCommandParameter="{x:Static x:Int32 0}"/>
+
+                    <Slider Grid.Column="1" Minimum="-12" Maximum="12" Value="0"
+                             Orientation="Vertical"
+                             HeightRequest="150"
+                             ValueChangedCommand="{Binding SetEqualizerBandCommand}"
+                             ValueChangedCommandParameter="{x:Static x:Int32 1}"/>
+
+                    <Slider Grid.Column="2" Minimum="-12" Maximum="12" Value="0"
+                             Orientation="Vertical"
+                             HeightRequest="150"
+                             ValueChangedCommand="{Binding SetEqualizerBandCommand}"
+                             ValueChangedCommandParameter="{x:Static x:Int32 2}"/>
+
+                    <Slider Grid.Column="3" Minimum="-12" Maximum="12" Value="0"
+                             Orientation="Vertical"
+                             HeightRequest="150"
+                             ValueChangedCommand="{Binding SetEqualizerBandCommand}"
+                             ValueChangedCommandParameter="{x:Static x:Int32 3}"/>
+
+                    <Slider Grid.Column="4" Minimum="-12" Maximum="12" Value="0"
+                             Orientation="Vertical"
+                             HeightRequest="150"
+                             ValueChangedCommand="{Binding SetEqualizerBandCommand}"
+                             ValueChangedCommandParameter="{x:Static x:Int32 4}"/>
+                </Grid>
+
+                <Picker Grid.Row="2" 
+                        ItemsSource="{Binding EqualizerPresets}"
+                        SelectedItem="{Binding SelectedEqualizerPreset}"
+                        Title="Presets"
+                        HorizontalOptions="Fill"
+                        Margin="0,10">
+                    <Picker.Behaviors>
+                        <toolkit:EventToCommandBehavior 
+                            EventName="SelectedIndexChanged"
+                            Command="{Binding ApplyEqualizerPresetCommand}"
+                            CommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}"/>
+                    </Picker.Behaviors>
+                </Picker>
+            </Grid>
+
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding CloseEqualizerCommand}"/>
+            </Border.GestureRecognizers>
+        </Border>
+    </Grid>
+</ContentPage>

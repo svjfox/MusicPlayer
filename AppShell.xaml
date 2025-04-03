@@ -1,15 +1,24 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<Shell
-    x:Class="MusicPlayer.AppShell"
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MusicPlayer"
-    Shell.FlyoutBehavior="Disabled"
-    Title="MusicPlayer">
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:MusicPlayer.Views"
+       x:Class="MusicPlayer.AppShell"
+       Shell.FlyoutBehavior="Disabled">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <Tab Title="Home" Icon="home.png">
+            <ShellContent ContentTemplate="{DataTemplate views:HomePage}"/>
+        </Tab>
 
+        <Tab Title="Playlists" Icon="playlist.png">
+            <ShellContent ContentTemplate="{DataTemplate views:PlaylistsPage}"/>
+        </Tab>
+
+        <Tab Title="Player" Icon="play.png">
+            <ShellContent ContentTemplate="{DataTemplate views:PlayerPage}"/>
+        </Tab>
+
+        <Tab Title="Settings" Icon="settings.png">
+            <ShellContent ContentTemplate="{DataTemplate views:SettingsPage}"/>
+        </Tab>
+    </TabBar>
 </Shell>

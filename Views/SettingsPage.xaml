@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MusicPlayer.Views.SettingsPage"
+             Title="Settings"
+             xmlns:vm="clr-namespace:MusicPlayer.ViewModels"
+             x:DataType="vm:SettingsViewModel">
+
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="15">
+            <!-- Theme Selection -->
+            <Frame>
+                <StackLayout Spacing="10">
+                    <Label Text="App Theme" FontAttributes="Bold"/>
+                    <Picker Title="Select Theme"
+                            ItemsSource="{Binding AvailableThemes}"
+                            SelectedItem="{Binding SelectedTheme}"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Audio Quality -->
+            <Frame>
+                <StackLayout Spacing="10">
+                    <Label Text="Audio Quality" FontAttributes="Bold"/>
+                    <Picker Title="Select Quality"
+                            ItemsSource="{Binding AudioQualities}"
+                            SelectedItem="{Binding SelectedAudioQuality}"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Storage -->
+            <Frame>
+                <StackLayout Spacing="10">
+                    <Label Text="Storage" FontAttributes="Bold"/>
+                    <Button Text="Clear Cache"
+                            Command="{Binding ClearCacheCommand}"/>
+                    <Label Text="{Binding CacheSize}"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- About -->
+            <Frame>
+                <StackLayout Spacing="10">
+                    <Label Text="About" FontAttributes="Bold"/>
+                    <Label Text="{Binding AppVersion}"/>
+                    <Button Text="Rate App"
+                            Command="{Binding RateAppCommand}"/>
+                </StackLayout>
+            </Frame>
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

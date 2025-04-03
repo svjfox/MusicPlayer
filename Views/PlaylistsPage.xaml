@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MusicPlayer.Views.PlaylistsPage"
+             Title="Playlists"
+             xmlns:vm="clr-namespace:MusicPlayer.ViewModels"
+             x:DataType="vm:PlaylistsViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="10">
+        <!-- New Playlist Input -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="0,0,0,10">
+            <Entry Grid.Column="0" 
+                   Placeholder="New playlist name"
+                   Text="{Binding NewPlaylistName}"/>
+            <Button Grid.Column="1" 
+                    Text="Create"
+                    Command="{Binding CreatePlaylistCommand}"/>
+        </Grid>
+
+        <!-- Playlists List -->
+        <RefreshView Grid.Row="1" 
+                    Command="{Binding LoadPlaylistsCommand}"
+                    IsRefreshing="{Binding IsRefreshing}">
+            <CollectionView ItemsSource="{Binding Playlists}"
+                          SelectionMode="Single"
+                          SelectedItem="{Binding SelectedPlaylist}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10" ColumnDefinitions="Auto,*,Auto">
+                            <Image Source="{Binding CoverImage, 
+                                                  Converter={StaticResource NullToDefaultImageConverter}}"
+                                  WidthRequest="60"
+                                  HeightRequest="60"
+                                  Aspect="AspectFill"/>
+                            <StackLayout Grid.Column="1" Padding="10,0">
+                                <Label Text="{Binding Name}" 
+                                       FontSize="16"
+                                       FontAttributes="Bold"/>
+                                <Label Text="{Binding CreatedDate, StringFormat='Created: {0:d}'}" 
+                                       FontSize="14"/>
+                            </StackLayout>
+                            <Button Grid.Column="2" 
+                                    Text="⋮"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:PlaylistsViewModel}}, 
+                                                    Path=ViewPlaylistCommand}"
+                                    CommandParameter="{Binding .}"
+                                    BackgroundColor="Transparent"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>
