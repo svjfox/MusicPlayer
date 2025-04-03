@@ -72,7 +72,8 @@ namespace MusicPlayer.Services
                 .Where(pt => pt.PlaylistId == playlistId)
                 .ToListAsync();
             var trackIds = playlistTracks.Select(pt => pt.TrackId).ToList();
-            return await _database.Table<Track>().Where(t => trackIds.Contains(t.Id)).ToListAsync();
+            var tracks = await _database.Table<Track>().Where(t => trackIds.Contains(t.Id)).ToListAsync();
+            return tracks.AsEnumerable();
         }
     }
 }

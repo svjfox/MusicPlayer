@@ -1,7 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using IntelliJ.Lang.Annotations;
-
 namespace MusicPlayer.ViewModels
 {
     public partial class SettingsViewModel : BaseViewModel

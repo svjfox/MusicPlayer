@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using MusicPlayer.Services;
 
 namespace MusicPlayer
 {
@@ -48,7 +49,7 @@ namespace MusicPlayer
             if (intent.Action != Intent.ActionMediaButton)
                 return;
 
-            var keyEvent = intent.GetParcelableExtra<KeyEvent>(Intent.ExtraKeyEvent);
+            var keyEvent = (KeyEvent)intent.GetParcelableExtra(Intent.ExtraKeyEvent);
             if (keyEvent?.Action != KeyEventActions.Down)
                 return;
 

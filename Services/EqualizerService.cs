@@ -1,4 +1,4 @@
-﻿using Android.Media.Audiofx;
+﻿using MusicPlayer.Services;
 using Plugin.Maui.Audio;
 
 namespace MusicPlayer.Services
@@ -71,6 +71,19 @@ namespace MusicPlayer.Services
             {
                 bands[bandIndex].SetGain(gain);
             }
+        }
+
+        public string[] GetPresets()
+        {
+            return new[] { "Flat", "Pop", "Rock", "Classical" };
+        }
+
+        public float[] GetBandGains()
+        {
+            if (_equalizer == null) return Array.Empty<float>();
+
+            var bands = _equalizer.GetBands();
+            return bands.Select(b => b.GetGain()).ToArray();
         }
     }
 }

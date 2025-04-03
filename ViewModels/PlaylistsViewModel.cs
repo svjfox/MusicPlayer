@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using IntelliJ.Lang.Annotations;
 using MusicPlayer.Models;
 using MusicPlayer.Services;
-using static Android.Provider.MediaStore.Audio;
 using System.Collections.ObjectModel;
 
 namespace MusicPlayer.ViewModels

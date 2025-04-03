@@ -17,8 +17,7 @@ public class MainApplication : MauiApplication
     {
         base.OnCreate();
 
-        // Настройка уведомлений для аудио
-        AudioManager.Init(this);
+        // Удален вызов AudioManager.Init(this)
 
         // Создание канала уведомлений
         if (Build.VERSION.SdkInt >= BuildVersionCodes.O)

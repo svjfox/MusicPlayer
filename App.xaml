@@ -1,4 +1,7 @@
-﻿<Application.Resources>
+﻿<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MusicPlayer.App">
+    <Application.Resources>
     <ResourceDictionary>
         <Color x:Key="Primary">#6750A4</Color>
         <Color x:Key="PrimaryDark">#4F378B</Color>
@@ -16,5 +19,7 @@
             <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Background}, 
                                                                      Dark={StaticResource BackgroundDark}}"/>
         </Style>
-    </ResourceDictionary>
+            <local:BoolToColorConverter x:Key="BoolToColorConverter"/>
+        </ResourceDictionary>
 </Application.Resources>
+</Application>

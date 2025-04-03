@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using IntelliJ.Lang.Annotations;
 using MusicPlayer.Models;
 using MusicPlayer.Services;
 using System.Collections.ObjectModel;
@@ -44,33 +43,28 @@ namespace MusicPlayer.ViewModels
         [RelayCommand]
         private async Task PlayPlaylist()
         {
+            if (Tracks.Count == 0) return;
+
             await _audioService.SetPlaylistAsync(Tracks);
             await _audioService.PlayAsync();
         }
 
         [RelayCommand]
-        private async Task ShowOptions(Track track)
+        private async Task PlayTrack(Track track)
         {
-            var action = await Shell.Current.DisplayActionSheet(
-                track.Title, "Cancel", null,
-                "Play Now", "Add to Queue", "Remove from Playlist");
+            if (track == null) return;
 
-            switch (action)
+            // Если текущий плейлист не установлен, устанавливаем его
+            if (_audioService.CurrentPlaylist != Tracks)
             {
-                case "Play Now":
-                    await _audioService.LoadTrackAsync(track);
-                    await _audioService.PlayAsync();
-                    break;
-
-                case "Add to Queue":
-                    // Логика добавления в очередь
-                    break;
-
-                case "Remove from Playlist":
-                    await _dataService.RemoveTrackFromPlaylistAsync(track.Id, Playlist.Id);
-                    await LoadTracks();
-                    break;
+                await _audioService.SetPlaylistAsync(Tracks, Tracks.IndexOf(track));
             }
+            else
+            {
+                await _audioService.LoadTrackAsync(track);
+            }
+
+            await _audioService.PlayAsync();
         }
     }
 }
