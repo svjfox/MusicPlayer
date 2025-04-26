@@ -4,7 +4,7 @@ namespace MusicPlayer.Services
 {
     public class SleepTimerService
     {
-        private Timer _timer;
+        private System.Timers.Timer _timer; // Fully qualify the Timer type to avoid ambiguity
         private Action _onTimerElapsed;
         private DateTime _endTime;
 
@@ -18,7 +18,7 @@ namespace MusicPlayer.Services
             _onTimerElapsed = onElapsed;
             _endTime = DateTime.Now.AddMinutes(minutes);
 
-            _timer = new Timer(1000);
+            _timer = new System.Timers.Timer(1000); // Fully qualify the Timer type
             _timer.Elapsed += OnTimerElapsed;
             _timer.AutoReset = true;
             _timer.Start();

@@ -14,6 +14,7 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
+            .UseMauiCommunityToolkitMediaElement() // Убедитесь, что пакет установлен
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -22,19 +23,24 @@ public static class MauiProgram
                 fonts.AddFont("Poppins-Bold.ttf", "PoppinsBold");
             });
 
-        // Регистрация сервисов
-        builder.Services.AddSingleton<IAudioManager, AudioManager>();
-        builder.Services.AddSingleton<IAudioService, AudioService>();
+        // Регистрация сервисов  
+        builder.Services.AddSingleton<IAudioManager>(AudioManager.Current); // Используем AudioManager из Plugin.Maui.Audio
+        builder.Services.AddSingleton<IAudioService, AudioService>(); // Регистрация IAudioService
         builder.Services.AddSingleton<IEqualizerService, EqualizerService>();
         builder.Services.AddSingleton<IDataService, DataService>();
 
-        // Регистрация ViewModels
+#if ANDROID
+        // Регистрация платформоспецифичных сервисов для Android
+        builder.Services.AddSingleton<MusicPlayer.Platforms.Android.Services.AudioService>();
+#endif
+
+        // Регистрация ViewModels  
         builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<PlayerViewModel>();
         builder.Services.AddTransient<PlaylistsViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
 
-        // Регистрация страниц
+        // Регистрация страниц  
         builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<PlayerPage>();
         builder.Services.AddTransient<PlaylistsPage>();
@@ -47,3 +53,4 @@ public static class MauiProgram
         return builder.Build();
     }
 }
+

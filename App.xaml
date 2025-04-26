@@ -21,5 +21,9 @@
         </Style>
             <local:BoolToColorConverter x:Key="BoolToColorConverter"/>
         </ResourceDictionary>
-</Application.Resources>
+</Application.Resources>        <Style TargetType="Button">
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="TextColor" Value="{StaticResource Primary}" />
+        </Style>
+
 </Application>

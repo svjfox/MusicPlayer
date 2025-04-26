@@ -152,7 +152,12 @@
                     MaximumTrackColor="{StaticResource Secondary}"
                     WidthRequest="100"
                     HorizontalOptions="Center"
-                    ValueChangedCommand="{Binding VolumeChangedCommand}"/>
+                    ValueChangedCommand="{Binding VolumeChangedCommand}"/>                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+                <FlexLayout Direction="Row" JustifyContent="SpaceBetween">
+                    <Button Text="⏮" Command="{Binding PreviousCommand}" />
+                    <Button Text="{Binding PlayPauseIcon}" Command="{Binding TogglePlayCommand}" />
+                    <Button Text="⏭" Command="{Binding NextCommand}" />
+                </FlexLayout>
         </Grid>
     </Grid>
 </ContentPage>

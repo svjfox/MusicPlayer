@@ -46,6 +46,17 @@ namespace MusicPlayer.Services
             _audioManager = audioManager;
             _positionTimer = new System.Timers.Timer(500);
             _positionTimer.Elapsed += OnPositionTimerElapsed;
+
+            _audioPlayer = null!;
+            _sleepTimerCts = new CancellationTokenSource();
+            CurrentTrack = null!;
+            IsPlayingChanged = delegate { };
+            PositionChanged = delegate { };
+            TrackChanged = delegate { };
+            PlaybackEnded = delegate { };
+            ShuffleChanged = delegate { };
+            RepeatChanged = delegate { };
+            SleepTimerActivated = delegate { };
         }
 
         public async Task TogglePlay()
@@ -60,19 +71,20 @@ namespace MusicPlayer.Services
             }
         }
 
-        public async Task InitializeAsync(Stream initialStream = null)
+        public async Task InitializeAsync()
         {
             if (_audioPlayer != null) return;
 
             try
             {
-                // Create silent WAV stream for initialization
-                var silentWav = new byte[] {
-                                        0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
-                                        0x66, 0x6D, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
-                                        0x44, 0xAC, 0x00, 0x00, 0x88, 0x58, 0x01, 0x00, 0x02, 0x00, 0x10, 0x00,
-                                        0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00
-                                    };
+                // Создаем silent WAV поток для инициализации
+                var silentWav = new byte[]
+                {
+                        0x52, 0x49, 0x46, 0x46, 0x24, 0x00, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
+                        0x66, 0x6D, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
+                        0x44, 0xAC, 0x00, 0x00, 0x88, 0x58, 0x01, 0x00, 0x02, 0x00, 0x10, 0x00,
+                        0x64, 0x61, 0x74, 0x61, 0x00, 0x00, 0x00, 0x00
+                };
 
                 using var ms = new MemoryStream(silentWav);
                 _audioPlayer = _audioManager.CreatePlayer(ms);
@@ -128,37 +140,43 @@ namespace MusicPlayer.Services
             }
         }
 
-        public async Task PlayAsync()
+        public Task PlayAsync()
         {
-            if (_audioPlayer == null || CurrentTrack == null) return;
+            if (_audioPlayer == null || CurrentTrack == null) return Task.CompletedTask;
 
             _audioPlayer.Play();
             IsPlaying = true;
             _positionTimer.Start();
             IsPlayingChanged?.Invoke(this, true);
             UpdateNotification();
+
+            return Task.CompletedTask;
         }
 
-        public async Task PauseAsync()
+        public Task PauseAsync()
         {
-            if (_audioPlayer == null) return;
+            if (_audioPlayer == null) return Task.CompletedTask;
 
             _audioPlayer.Pause();
             IsPlaying = false;
             _positionTimer.Stop();
             IsPlayingChanged?.Invoke(this, false);
             UpdateNotification();
+
+            return Task.CompletedTask;
         }
 
-        public async Task StopAsync()
+        public Task StopAsync()
         {
-            if (_audioPlayer == null) return;
+            if (_audioPlayer == null) return Task.CompletedTask;
 
             _audioPlayer.Stop();
             IsPlaying = false;
             _positionTimer.Stop();
             IsPlayingChanged?.Invoke(this, false);
             UpdateNotification();
+
+            return Task.CompletedTask;
         }
 
         public async Task NextAsync()
@@ -202,9 +220,9 @@ namespace MusicPlayer.Services
             await PlayAsync();
         }
 
-        public async Task SeekToAsync(double position)
+        public Task SeekToAsync(double position)
         {
-            if (_audioPlayer == null) return;
+            if (_audioPlayer == null) return Task.CompletedTask;
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -212,6 +230,8 @@ namespace MusicPlayer.Services
             });
 
             PositionChanged?.Invoke(this, position);
+
+            return Task.CompletedTask;
         }
 
         public async Task SetVolumeAsync(double volume)
@@ -257,46 +277,48 @@ namespace MusicPlayer.Services
             {
                 await Task.Delay(TimeSpan.FromMinutes(minutes), _sleepTimerCts.Token);
                 await PauseAsync();
-                SleepTimerActivated?.Invoke(this, true);
+                SleepTimerActivated?.Invoke(this, EventArgs.Empty);
             }
             catch (TaskCanceledException)
             {
-                // Timer was canceled
+                // Таймер был отменен
             }
         }
 
-        public async Task CancelSleepTimer()
+        public Task CancelSleepTimer()
         {
             _sleepTimerCts?.Cancel();
+            return Task.CompletedTask;
         }
 
         private void UpdateNotification()
         {
 #if ANDROID
-            if (CurrentTrack == null || DeviceInfo.Platform != DevicePlatform.Android)
-                return;
+                if (CurrentTrack == null || DeviceInfo.Platform != DevicePlatform.Android)
+                    return;
 
-            _audioPlayer?.SetNotificationOptions(
-                title: CurrentTrack.Title,
-                subtitle: CurrentTrack.Artist,
-                description: CurrentTrack.Album,
-                image: CurrentTrack.Artwork,
-                actions: new List<NotificationAction>
-                {
-                                        new(1, "Previous", Android.Resource.Drawable.IcMediaPrevious),
-                                        new(2, IsPlaying ? "Pause" : "Play",
-                                            IsPlaying ? Android.Resource.Drawable.IcMediaPause : Android.Resource.Drawable.IcMediaPlay),
-                                        new(3, "Next", Android.Resource.Drawable.IcMediaNext)
-                });
+                MusicPlayer.Extensions.AudioPlayerExtensions.SetNotificationOptions(
+                    _audioPlayer,
+                    title: CurrentTrack.Title,
+                    subtitle: CurrentTrack.Artist,
+                    description: CurrentTrack.Album,
+                    image: CurrentTrack.Artwork,
+                    actions: new List<NotificationAction>
+                    {
+                        new(1, "Previous", Android.Resource.Drawable.IcMediaPrevious),
+                        new(2, IsPlaying ? "Pause" : "Play",
+                            IsPlaying ? Android.Resource.Drawable.IcMediaPause : Android.Resource.Drawable.IcMediaPlay),
+                        new(3, "Next", Android.Resource.Drawable.IcMediaNext)
+                    });
 #endif
         }
 
-        private void OnPositionTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void OnPositionTimerElapsed(object? sender, System.Timers.ElapsedEventArgs? e)
         {
             PositionChanged?.Invoke(this, CurrentPosition);
         }
 
-        private async void OnPlaybackEnded(object sender, EventArgs e)
+        private async void OnPlaybackEnded(object? sender, EventArgs? e)
         {
             if (_isRepeatEnabled && CurrentTrack != null)
             {
@@ -305,7 +327,7 @@ namespace MusicPlayer.Services
                 return;
             }
 
-            PlaybackEnded?.Invoke(this, e);
+            PlaybackEnded?.Invoke(this, e ?? EventArgs.Empty);
             await NextAsync();
         }
 
