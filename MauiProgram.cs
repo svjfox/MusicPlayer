@@ -23,7 +23,7 @@ public static class MauiProgram
             });
 
         // Регистрация сервисов
-        builder.Services.AddSingleton(AudioManager.Current);
+        builder.Services.AddSingleton<IAudioManager, AudioManager>();
         builder.Services.AddSingleton<IAudioService, AudioService>();
         builder.Services.AddSingleton<IEqualizerService, EqualizerService>();
         builder.Services.AddSingleton<IDataService, DataService>();

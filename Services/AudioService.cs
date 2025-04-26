@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Plugin.Maui.Audio;
 using MusicPlayer.Models;
 using MusicPlayer.Extensions;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Storage;
+using System.Linq;
 
 namespace MusicPlayer.Services
 {
